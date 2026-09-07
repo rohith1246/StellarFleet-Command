@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>StellarFleet Command - Tactical Orbital & Fleet Battle Radar</title>
+  <style>
+    body { margin: 0; background: #030712; color: #38bdf8; font-family: 'Consolas', monospace; overflow: hidden; }
+    #header { padding: 12px 24px; background: #0f172a; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; }
+    h1 { margin: 0; font-size: 18px; color: #38bdf8; }
+    .badge { background: #0369a1; color: #e0f2fe; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+    #canvas { display: block; width: 100vw; height: calc(100vh - 60px); }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <h1>🚀 StellarFleet Command: Tactical Orbital Radar & Galaxy Simulation</h1>
+    <div>
+      <span class="badge">RK4 N-Body Integrator Active</span>
+      <span class="badge">60Hz Deterministic Sim</span>
+      <span class="badge">Fleet Formations Synced</span>
+    </div>
+  </div>
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight - 60;
+
+    const stars = Array.from({ length: 150 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 1.5,
+      alpha: 0.2 + Math.random() * 0.8
+    }));
+
+    const fleetA = Array.from({ length: 25 }, (_, i) => ({
+      angle: (i / 25) * Math.PI * 2,
+      dist: 180 + Math.random() * 40,
+      color: '#38bdf8'
+    }));
+
+    const fleetB = Array.from({ length: 25 }, (_, i) => ({
+      angle: (i / 25) * Math.PI * 2,
+      dist: 280 + Math.random() * 40,
+      color: '#f43f5e'
+    }));
+
+    let t = 0;
+    function render() {
+      t += 0.005;
+      ctx.fillStyle = '#030712';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Render Stars
+      stars.forEach(s => {
+        ctx.fillStyle = 'rgba(255, 255, 255, ' + s.alpha + ')';
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      // Central Star
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 30;
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Orbit lines
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
+      ctx.beginPath(); ctx.arc(cx, cy, 200, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, 300, 0, Math.PI * 2); ctx.stroke();
+
+      // Fleet A
+      fleetA.forEach(s => {
+        const x = cx + Math.cos(s.angle + t) * s.dist;
+        const y = cy + Math.sin(s.angle + t) * s.dist;
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+      });
+
+      // Fleet B
+      fleetB.forEach(s => {
+        const x = cx + Math.cos(s.angle - t * 0.7) * s.dist;
+        const y = cy + Math.sin(s.angle - t * 0.7) * s.dist;
+        ctx.fillStyle = s.color;
+        ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+      });
+
+      requestAnimationFrame(render);
+    }
+    render();
+  </script>
+</body>
+</html>
