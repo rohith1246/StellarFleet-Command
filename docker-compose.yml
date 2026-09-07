@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  stellarfleet-command:
+    build: .
+    container_name: stellarfleet-command_app
+    ports:
+      - "4500:4500"
+    restart: always
